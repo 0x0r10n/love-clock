@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+*{box-sizing:border-box}
+
+body{
+	margin:0;
+	padding:0;
+	min-height:100vh;
+	background:linear-gradient(135deg,#140b2e,#241046,#142a63,#0f1840);
+	background-size:400% 400%;
+	animation:bgShift 24s ease infinite;
+	color:#f4e9ff;
+	font-family:"Inter","sans-serif";
+	font-size:12px;
+	overflow:auto;
+}
+@keyframes bgShift{
+	0%{background-position:0% 50%}
+	50%{background-position:100% 50%}
+	100%{background-position:0% 50%}
+}
+
+/* soft floating glow + vignette behind everything */
+body::before{
+	content:"";
+	position:fixed;
+	inset:0;
+	background:
+		radial-gradient(620px circle at 18% 28%,rgba(140,90,255,.22),transparent 60%),
+		radial-gradient(720px circle at 86% 72%,rgba(70,130,255,.22),transparent 60%),
+		radial-gradient(140% 120% at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%);
+	pointer-events:none;
+	z-index:0;
+}
+
+#mainDiv{
+	position:relative;
+	z-index:1;
+	width:100%;
+	height:100%;
+}
+
+#content{
+	position:relative;
+}
+
+/* ---- code editor card ---- */
+#code{
+	position:relative;
+	float:left;
+	width:440px;
+	height:auto;
+	min-height:400px;
+	color:#cdb8e8;
+	font-family:"JetBrains Mono","Consolas","Monaco","Courier New",monospace;
+	font-size:12.5px;
+	line-height:1.55;
+	padding:48px 30px 28px;
+	background:linear-gradient(180deg,rgba(28,18,48,.72),rgba(18,11,34,.66));
+	border:1px solid rgba(255,255,255,.10);
+	border-radius:16px;
+	backdrop-filter:blur(16px);
+	-webkit-backdrop-filter:blur(16px);
+	box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);
+	transition:transform .4s ease,box-shadow .4s ease;
+}
+#code:hover{
+	transform:translateY(-4px);
+	box-shadow:0 32px 70px rgba(0,0,0,.55),0 0 40px rgba(120,100,255,.16),inset 0 1px 0 rgba(255,255,255,.08);
+}
+/* editor title bar: traffic-light dots */
+#code::before{
+	content:"";
+	position:absolute;
+	top:17px;left:20px;
+	width:54px;height:12px;
+	background:
+		radial-gradient(circle 6px at 6px 6px,#ff5f57 96%,transparent),
+		radial-gradient(circle 6px at 26px 6px,#febc2e 96%,transparent),
+		radial-gradient(circle 6px at 46px 6px,#28c840 96%,transparent);
+	background-repeat:no-repeat;
+}
+/* editor title bar: filename */
+#code::after{
+	content:"shazar \2665 firdaous.java";
+	position:absolute;
+	top:15px;left:0;right:0;
+	text-align:center;
+	font-size:11px;
+	letter-spacing:.5px;
+	color:#9a86c7;
+}
+#code .string{color:#7fc4ff}
+#code .keyword{color:#b388ff;font-weight:bold}
+#code .placeholder{margin-left:15px}
+#code .space{margin-left:7px}
+#code .comments{color:#9b88c9;font-style:italic}
+
+/* ---- heart + words ---- */
+#loveHeart{
+	float:left;
+	width:670px;
+	height:625px;
+	position:relative;
+}
+#garden{width:100%;height:100%}
+
+#words{
+	position:relative;
+	z-index:2;
+	font-family:"Inter","sans-serif";
+	width:500px;
+	font-size:25px;
+	font-weight:300;
+	color:#f3e7ff;
+}
+#messages{
+	display:none;
+	letter-spacing:.3px;
+	text-shadow:0 2px 18px rgba(0,0,0,.6),0 0 30px rgba(120,80,255,.3);
+}
+#elapseClock{
+	text-align:right;
+	font-size:18px;
+	margin-top:16px;
+	margin-bottom:10px;
+	color:#cdd8ff;
+}
+#elapseClock .digit{
+	font-family:"digit";
+	font-size:42px;
+	color:#9db4ff;
+	text-shadow:0 0 16px rgba(110,120,255,.85),0 0 6px rgba(150,170,255,.95);
+	animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{
+	0%,100%{text-shadow:0 0 14px rgba(110,120,255,.6),0 0 5px rgba(150,170,255,.85)}
+	50%{text-shadow:0 0 24px rgba(140,110,255,.95),0 0 10px rgba(160,180,255,1)}
+}
+
+#loveu{
+	padding:5px;
+	font-size:30px;
+	line-height:1.3;
+	margin-top:70px;
+	margin-right:90px;
+	text-align:right;
+	display:none;
+	font-family:"Dancing Script","cursive";
+	color:#e7e3ff;
+	text-shadow:0 2px 22px rgba(120,110,255,.5);
+}
+#loveu .signature{
+	margin-top:14px;
+	font-size:24px;
+	font-style:italic;
+	color:#bcb3ff;
+}
+
+#clickSound{display:none}
+
+#copyright{
+	margin-top:30px;
+	text-align:center;
+	width:100%;
+	color:#a594c4;
+	font-size:12px;
+	letter-spacing:.5px;
+}
+#copyright a{
+	color:#9eb4ff;
+	text-decoration:none;
+	transition:color .2s ease;
+}
+#copyright a:hover{color:#cdd8ff}
+
+#errorMsg{
+	width:100%;
+	text-align:center;
+	font-size:24px;
+	position:absolute;
+	top:100px;
+	left:0;
+	color:#cdd8ff;
+}
+
+/* ---- stacked mobile layout (toggled by JS .mobile class) ---- */
+body.mobile{overflow-x:hidden}
+.mobile #mainDiv{padding:0}
+.mobile #content{
+	width:auto!important;
+	height:auto!important;
+	margin:20px auto 0!important;
+	max-width:500px;
+	padding:0 16px;
+	transform:none!important;
+}
+.mobile #code{
+	float:none!important;
+	width:100%!important;
+	min-height:0;
+	margin:0 auto 26px!important;
+	font-size:13px;
+	line-height:1.6;
+}
+.mobile #loveHeart{float:none!important}
+.heartWrap{margin:0 auto;overflow:hidden}
+.mobile #copyright{margin-top:20px;padding:0 16px}
+
+@media (max-width:380px){
+	.mobile #code{font-size:12px;padding:46px 18px 22px}
+}

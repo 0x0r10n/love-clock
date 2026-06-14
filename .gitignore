@@ -1,0 +1,9 @@
+# Editor / tooling
+.vscode/
+.claude/
+
+# Vercel
+.vercel/
+
+# Personal photo — not used by the site, kept out of the public repo
+us.jpg

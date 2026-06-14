@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>shazar's story for Firdaous</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<style type="text/css">
+		@font-face {
+			font-family: digit;
+			src: url('digital-7_mono.ttf') format("truetype");
+		}
+	</style>
+	<link href="css/default.css" type="text/css" rel="stylesheet">
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/garden.js"></script>
+    <script type="text/javascript" src="js/functions.js"></script>
+</head>
+
+<body>
+	<div id="mainDiv">
+		<div id="content">
+			<div id="code">
+				<span class="comments">/**</span><br />
+				<span class="space"/><span class="comments">* Many women are admired for a moment,</span><br />
+				<span class="space"/><span class="comments">* but a rare few are remembered for a lifetime.</span><br />
+				<span class="space"/><span class="comments">*</span><br />
+				<span class="space"/><span class="comments">* Firdaous — talented, skillful, and strong,</span><br />
+				<span class="space"/><span class="comments">* a woman of virtue the world rarely deserves.</span><br />
+				<span class="space"/><span class="comments">* And somehow, I get to call you mine.</span><br />
+				<span class="comments">*/</span><br />
+				Man me = <span class="keyword">new</span> Man(<span class="string">"shazar"</span>);<br />
+				Treasure you = <span class="keyword">new</span> Treasure(<span class="string">"Firdaous"</span>);<br />
+				<br />
+				<span class="comments">// Since December 9, 2025, every day with you has been a gift.</span><br />
+				me.cherish(you);<br />
+				<br />
+				<span class="comments">// You create, you excel, you carry grace in everything.</span><br />
+				you.shine();<br />
+				<br />
+				<span class="comments">// A virtuous heart, worth far more than rubies —</span><br />
+				<span class="comments">// the kind a man would gladly give his life for.</span><br />
+				<span class="keyword">boolean</span> foreverYours = <span class="keyword">true</span>;<br />
+				<br />
+				<span class="keyword">while</span> (foreverYours) {<br />
+				<span class="placeholder"/>me.honor(you);<br />
+				<span class="placeholder"/>me.protect(you);<br />
+				}<br />
+				<br />
+				<span class="comments">// Skillful hands, a brilliant mind, a faithful soul.</span><br />
+				<span class="comments">// Rare. Irreplaceable. Mine.</span><br />
+				System.out.println(<span class="string">"Firdaous, you are one in a billion — and I am yours, completely."</span>);<br />
+			</div>
+			<div id="loveHeart">
+				<canvas id="garden"></canvas>
+				<div id="words">
+					<div id="messages">
+						Firdaous, my heart has been devoted to you for
+						<div id="elapseClock"></div>
+					</div>
+					<div id="loveu">
+						A woman worth dying for — forever isn't long enough with you.<br/>
+						<div class="signature">- shazar</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="copyright">
+			Copyright © 2025 <a href='https://www.instagram.com/dark.lore_/?hl=en'>shazar</a> 2025-till the end
+		</div>
+	</div>
+	<script type="text/javascript">
+		var offsetX = $("#loveHeart").width() / 2;
+		var offsetY = $("#loveHeart").height() / 2 - 55;
+		var together = new Date();
+		together.setFullYear(2025, 11, 9);
+		together.setHours(20);
+		together.setMinutes(0);
+		together.setSeconds(0);
+		together.setMilliseconds(0);
+		
+		if (!document.createElement('canvas').getContext) {
+			var msg = document.createElement("div");
+			msg.id = "errorMsg";
+			msg.innerHTML = "Your browser doesn't support HTML5!<br/>Recommend use Chrome 14+/IE 9+/Firefox 7+/Safari 4+"; 
+			document.body.appendChild(msg);
+			$("#code").css("display", "none")
+			$("#copyright").css("position", "absolute");
+			$("#copyright").css("bottom", "10px");
+		    document.execCommand("stop");
+		} else {
+			setTimeout(function () {
+				startHeartAnimation();
+			}, 5000);
+
+			timeElapse(together);
+			setInterval(function () {
+				timeElapse(together);
+			}, 500);
+
+			adjustCodePosition();
+			$("#code").typewriter();
+		}
+
+		// ---- responsive layout: runs after the library's own sizing ----
+		function makeResponsive() {
+			var vw = $(window).width();
+			var $content = $("#content"), $code = $("#code"), $heart = $("#loveHeart");
+
+			// clear anything we set on a previous pass
+			document.body.classList.remove("mobile");
+			$content.css("transform", "");
+
+			if (vw <= 900) {
+				// stacked, readable layout for phones
+				document.body.classList.add("mobile");
+				$content.css({ width: "", height: "", marginLeft: "", marginTop: "" });
+				$code.css("margin-top", "");
+
+				// scale the fixed-size heart canvas to fit the screen
+				var s = Math.min(1, (Math.min(vw, 460) - 8) / 670);
+				if (!$heart.parent().hasClass("heartWrap")) {
+					$heart.wrap('<div class="heartWrap"></div>');
+				}
+				$heart.css({ transformOrigin: "top left", transform: "scale(" + s + ")" });
+				$(".heartWrap").css({ width: 670 * s, height: 625 * s });
+			} else if (vw < 1180) {
+				// shrink-to-fit on smaller desktops / tablets so nothing clips
+				var cw = $content.outerWidth() || 1120;
+				var sc = Math.min(1, (vw - 24) / cw);
+				$content.css({
+					transform: "scale(" + sc + ")",
+					transformOrigin: "top left",
+					marginLeft: Math.max((vw - cw * sc) / 2, 0)
+				});
+			}
+		}
+		$(function () { makeResponsive(); });
+	</script>
+</body>
+</html>
