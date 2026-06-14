@@ -60,7 +60,7 @@
 						<div id="elapseClock"></div>
 					</div>
 					<div id="loveu">
-						A woman worth dying for — forever isn't long enough with you.<br/>
+						A woman worth dying for, forever isn't long enough with you.<br/>
 						<div class="signature">- shazar</div>
 					</div>
 				</div>
@@ -161,6 +161,117 @@
 			// a gentle, continuous stream
 			for (var i = 0; i < 8; i++) setTimeout(spawn, i * 700);
 			setInterval(spawn, 1400);
+		})();
+
+		// ---- rotating love message: a brand-new line from Grok every hour ----
+		// The message is generated server-side (see /api/message). The browser asks
+		// for a fresh one at the top of each hour and remembers the last ~50 so Grok
+		// is told not to repeat them. If the API is ever unavailable, it falls back
+		// to a built-in list so the page always shows something beautiful.
+		(function () {
+			var fallback = [
+				"A woman worth dying for, forever isn't long enough with you.",
+				"Of all the souls in this world, my heart only ever wanted yours.",
+				"You are the quiet miracle I never knew I was waiting for.",
+				"Every heartbeat of mine has learned the rhythm of your name.",
+				"With you, even ordinary days feel like a gift I don't deserve.",
+				"You are my favorite prayer and my softest answer.",
+				"In a billion faces, my eyes will always find only you.",
+				"You make forever sound far too short, my love.",
+				"Loving you is the easiest and truest thing I have ever done.",
+				"You are the home my heart kept searching for all along.",
+				"My world grew brighter the moment you walked into it.",
+				"You are the poem my heart writes again and again.",
+				"Beside you, I have found the peace I spent a lifetime chasing.",
+				"You are rarer than rubies and dearer than my own breath.",
+				"My heart beats in a language only you can read.",
+				"You are the dream I am terrified of ever waking from.",
+				"Every road I have ever walked was quietly leading me to you.",
+				"You turned my whole life into a love story worth telling.",
+				"To love you is the greatest honor my heart will ever hold.",
+				"You are the calm in my chaos and the light in my dark.",
+				"My soul recognized yours before my eyes ever did.",
+				"You are the reason I believe forever can be real.",
+				"In your love, I finally understood what it means to belong.",
+				"You are the gentlest thing this rough world ever gave me.",
+				"My heart was always yours, even before it knew your name.",
+				"You are the wish I would spend every star to keep.",
+				"With you, my forever finally has a face and a name.",
+				"You are the sweetest chapter in the story of my life.",
+				"Loving you feels like coming home after a long, cold journey.",
+				"You are my one in a billion, and I am yours, completely."
+			];
+
+			var HISTORY_KEY = "loveMsgHistory";
+			var CURRENT_KEY = "loveMsgCurrent";
+
+			// one bucket per 12 hours, so the message changes twice a day
+			function nowHour() { return Math.floor(Date.now() / (12 * 3600000)); }
+
+			function getHistory() {
+				try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+				catch (_) { return []; }
+			}
+			function pushHistory(text) {
+				var h = getHistory();
+				h.push(text);
+				if (h.length > 50) h = h.slice(-50);
+				try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch (_) {}
+			}
+
+			function render(text) {
+				$("#loveu").html(text + '<br/><div class="signature">- shazar</div>');
+			}
+			function fade(text) {
+				var $l = $("#loveu");
+				$l.fadeOut(800, function () { render(text); $l.fadeIn(1200); });
+			}
+
+			function fallbackLine() {
+				var hist = getHistory();
+				// prefer a fallback line we haven't shown recently
+				var pool = fallback.filter(function (m) { return hist.indexOf(m) === -1; });
+				if (!pool.length) pool = fallback;
+				return pool[nowHour() % pool.length];
+			}
+
+			// fetch a fresh line from Grok; resolve with text (or a fallback on failure)
+			function fetchNew() {
+				return fetch("/api/message", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ recent: getHistory() })
+				})
+				.then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
+				.then(function (d) { return (d && d.message) ? d.message : fallbackLine(); })
+				.catch(function () { return fallbackLine(); });
+			}
+
+			function setMessage(text, animate) {
+				pushHistory(text);
+				try { localStorage.setItem(CURRENT_KEY, JSON.stringify({ hour: nowHour(), text: text })); } catch (_) {}
+				if (animate) fade(text); else render(text);
+			}
+
+			// On load: reuse this hour's message if we already have one (so reloads
+			// don't burn API calls); otherwise pull a fresh one.
+			var stored = null;
+			try { stored = JSON.parse(localStorage.getItem(CURRENT_KEY)); } catch (_) {}
+			if (stored && stored.hour === nowHour() && stored.text) {
+				render(stored.text);
+			} else {
+				fetchNew().then(function (t) { setMessage(t, false); });
+			}
+
+			// Switch right at the top of each new hour.
+			var lastHour = stored ? stored.hour : nowHour();
+			setInterval(function () {
+				var h = nowHour();
+				if (h !== lastHour) {
+					lastHour = h;
+					fetchNew().then(function (t) { setMessage(t, true); });
+				}
+			}, 20 * 1000);
 		})();
 
 		// ---- background music: autoplay, falling back to the first user interaction ----
