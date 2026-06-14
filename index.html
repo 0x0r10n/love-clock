@@ -18,6 +18,7 @@
 
 <body>
 	<audio id="bgMusic" src="song.mp3" loop preload="auto"></audio>
+	<div id="floatingHearts" aria-hidden="true"></div>
 	<div id="mainDiv">
 		<div id="content">
 			<div id="code">
@@ -118,7 +119,8 @@
 				$code.css("margin-top", "");
 
 				// scale the fixed-size heart canvas to fit the screen
-				var s = Math.min(1, (Math.min(vw, 460) - 8) / 670);
+				// (subtract container side-padding so it never overflows / gets clipped)
+				var s = Math.min(1, Math.min(vw - 40, 460) / 670);
 				if (!$heart.parent().hasClass("heartWrap")) {
 					$heart.wrap('<div class="heartWrap"></div>');
 				}
@@ -136,6 +138,30 @@
 			}
 		}
 		$(function () { makeResponsive(); });
+
+		// ---- floating blue heart emojis drifting up the screen ----
+		(function () {
+			var container = document.getElementById("floatingHearts");
+			if (!container) return;
+			var hearts = ["💙", "🩵"]; // 💙 and 🩵 (light blue)
+
+			function spawn() {
+				var s = document.createElement("span");
+				s.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+				var size = 14 + Math.random() * 26;          // 14–40px
+				var dur = 9 + Math.random() * 8;              // 9–17s
+				s.style.left = Math.random() * 100 + "vw";
+				s.style.fontSize = size + "px";
+				s.style.animationDuration = dur + "s";
+				s.style.setProperty("--drift", (Math.random() * 60 - 30) + "px");
+				container.appendChild(s);
+				setTimeout(function () { s.remove(); }, dur * 1000);
+			}
+
+			// a gentle, continuous stream
+			for (var i = 0; i < 8; i++) setTimeout(spawn, i * 700);
+			setInterval(spawn, 1400);
+		})();
 
 		// ---- background music: autoplay, falling back to the first user interaction ----
 		(function () {

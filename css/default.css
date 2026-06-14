@@ -33,6 +33,32 @@ body::before{
 	z-index:0;
 }
 
+/* floating blue hearts (decorative, behind the content) */
+#floatingHearts{
+	position:fixed;
+	inset:0;
+	overflow:hidden;
+	pointer-events:none;
+	z-index:0;
+}
+#floatingHearts span{
+	position:absolute;
+	bottom:-48px;
+	--drift:0px;
+	opacity:0;
+	will-change:transform,opacity;
+	filter:drop-shadow(0 0 6px rgba(90,150,255,.65));
+	animation-name:floatUp;
+	animation-timing-function:linear;
+	animation-iteration-count:1;
+}
+@keyframes floatUp{
+	0%{transform:translate(0,0) rotate(0deg);opacity:0}
+	12%{opacity:.85}
+	88%{opacity:.7}
+	100%{transform:translate(var(--drift),-112vh) rotate(24deg);opacity:0}
+}
+
 #mainDiv{
 	position:relative;
 	z-index:1;
@@ -190,7 +216,7 @@ body.mobile{overflow-x:hidden}
 .mobile #content{
 	width:auto!important;
 	height:auto!important;
-	margin:16px auto 0!important;
+	margin:38px auto 0!important;
 	max-width:500px;
 	padding:0 16px;
 	transform:none!important;
@@ -209,7 +235,7 @@ body.mobile{overflow-x:hidden}
 }
 .mobile #loveHeart{float:none!important}
 .heartWrap{margin:0 auto;overflow:hidden}
-.mobile .heartWrap{order:0;margin:0 auto 14px}   /* love clock goes up top */
+.mobile .heartWrap{order:0;margin:0 auto 20px}   /* love clock goes up top */
 .mobile #copyright{margin-top:20px;padding:0 16px}
 
 @media (max-width:380px){
