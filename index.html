@@ -17,6 +17,7 @@
 </head>
 
 <body>
+	<audio id="bgMusic" src="song.mp3" loop preload="auto"></audio>
 	<div id="mainDiv">
 		<div id="content">
 			<div id="code">
@@ -135,6 +136,27 @@
 			}
 		}
 		$(function () { makeResponsive(); });
+
+		// ---- background music: autoplay, falling back to the first user interaction ----
+		(function () {
+			var audio = document.getElementById("bgMusic");
+			if (!audio) return;
+			var events = ["click", "touchstart", "keydown", "scroll", "wheel"];
+
+			function removeTriggers() {
+				events.forEach(function (ev) { window.removeEventListener(ev, startMusic); });
+			}
+			function startMusic() {
+				audio.play().then(removeTriggers).catch(function () {});
+			}
+
+			// try to play right away (works where the browser allows autoplay)
+			startMusic();
+			// otherwise, the first interaction anywhere kicks it off
+			events.forEach(function (ev) {
+				window.addEventListener(ev, startMusic, { passive: true });
+			});
+		})();
 	</script>
 </body>
 </html>
