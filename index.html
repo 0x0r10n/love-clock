@@ -163,9 +163,9 @@
 			setInterval(spawn, 1400);
 		})();
 
-		// ---- rotating love message: a brand-new line from Grok every hour ----
+		// ---- rotating love message: a brand-new line from Grok every 4 hours ----
 		// The message is generated server-side (see /api/message). The browser asks
-		// for a fresh one at the top of each hour and remembers the last ~50 so Grok
+		// for a fresh one at the top of each 4-hour window and remembers the last ~50 so Grok
 		// is told not to repeat them. If the API is ever unavailable, it falls back
 		// to a built-in list so the page always shows something beautiful.
 		(function () {
@@ -205,8 +205,8 @@
 			var HISTORY_KEY = "loveMsgHistory";
 			var CURRENT_KEY = "loveMsgCurrent";
 
-			// one bucket per 12 hours, so the message changes twice a day
-			function nowHour() { return Math.floor(Date.now() / (12 * 3600000)); }
+			// one bucket per 4 hours, so the message changes six times a day
+			function nowHour() { return Math.floor(Date.now() / (4 * 3600000)); }
 
 			function getHistory() {
 				try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
@@ -253,7 +253,7 @@
 				if (animate) fade(text); else render(text);
 			}
 
-			// On load: reuse this hour's message if we already have one (so reloads
+			// On load: reuse this window's message if we already have one (so reloads
 			// don't burn API calls); otherwise pull a fresh one.
 			var stored = null;
 			try { stored = JSON.parse(localStorage.getItem(CURRENT_KEY)); } catch (_) {}
@@ -263,7 +263,7 @@
 				fetchNew().then(function (t) { setMessage(t, false); });
 			}
 
-			// Switch right at the top of each new hour.
+			// Switch right at the top of each new 4-hour window.
 			var lastHour = stored ? stored.hour : nowHour();
 			setInterval(function () {
 				var h = nowHour();
