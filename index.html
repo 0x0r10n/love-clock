@@ -79,7 +79,207 @@
 		together.setMinutes(0);
 		together.setSeconds(0);
 		together.setMilliseconds(0);
-		
+
+		// ---- rotating "code letter": a brand-new love-letter every 4 hours ----
+		// Each window the browser asks Grok (see /api/letter) for a fresh letter and
+		// assembles it into these styled code spans, remembering recent closing lines
+		// so Grok never repeats itself. The hand-written variants below are only a
+		// fallback for when the API is unavailable. Variant 0 is the letter already
+		// written into the page, so something beautiful shows even without JS.
+		function codeBucket() { return Math.floor(Date.now() / (4 * 3600000)); }
+		function cmt(t) { return '<span class="comments">' + t + '</span>'; }
+		function kw(t)  { return '<span class="keyword">' + t + '</span>'; }
+		function str(t) { return '<span class="string">' + t + '</span>'; }
+		var sp2 = '<span class="space"></span>', pad = '<span class="placeholder"></span>';
+		function letter(lines) { return lines.join('<br />') + '<br />'; }
+
+		var codeLetters = [
+			$("#code").html(),
+			letter([
+				cmt('/**'),
+				sp2 + cmt('* Some love stories are written in ink,'),
+				sp2 + cmt('* but ours is compiled into every heartbeat.'),
+				sp2 + cmt('*'),
+				sp2 + cmt('* Firdaous — gentle, radiant, and rare,'),
+				sp2 + cmt('* the answer to prayers I forgot I had made.'),
+				sp2 + cmt('* And somehow, you chose me too.'),
+				cmt('*/'),
+				'Man me = ' + kw('new') + ' Man(' + str('"shazar"') + ');',
+				'Treasure you = ' + kw('new') + ' Treasure(' + str('"Firdaous"') + ');',
+				'',
+				cmt('// Since December 9, 2025, my code finally found its meaning.'),
+				'me.cherish(you);',
+				'',
+				cmt('// You build, you bloom, you turn effort into art.'),
+				'you.create();',
+				'',
+				cmt('// A faithful heart, more precious than gold —'),
+				cmt('// the kind worth guarding with a lifetime.'),
+				kw('boolean') + ' foreverYours = ' + kw('true') + ';',
+				'',
+				kw('while') + ' (foreverYours) {',
+				pad + 'me.adore(you);',
+				pad + 'me.protect(you);',
+				'}',
+				'',
+				cmt('// Brilliant mind, tender soul, unbreakable spirit.'),
+				cmt('// Rare. Irreplaceable. Mine.'),
+				'System.out.println(' + str('"Firdaous, in a world of billions, my heart compiles only for you."') + ');'
+			]),
+			letter([
+				cmt('/**'),
+				sp2 + cmt('* Many things in life run on logic,'),
+				sp2 + cmt('* but loving you needs no condition to be true.'),
+				sp2 + cmt('*'),
+				sp2 + cmt('* Firdaous — kind, skillful, and bright,'),
+				sp2 + cmt('* a rare soul this world did little to deserve.'),
+				sp2 + cmt('* And yet, here you are, beside me.'),
+				cmt('*/'),
+				'Man me = ' + kw('new') + ' Man(' + str('"shazar"') + ');',
+				'Treasure you = ' + kw('new') + ' Treasure(' + str('"Firdaous"') + ');',
+				'',
+				cmt('// Since December 9, 2025, every sunrise has carried your name.'),
+				'me.cherish(you);',
+				'',
+				cmt('// You strive, you shine, you make the hard look effortless.'),
+				'you.excel();',
+				'',
+				cmt('// A virtuous heart, worth more than every jewel —'),
+				cmt('// the kind a man would cross oceans for.'),
+				kw('boolean') + ' foreverYours = ' + kw('true') + ';',
+				'',
+				kw('while') + ' (foreverYours) {',
+				pad + 'me.honor(you);',
+				pad + 'me.stayLoyal(you);',
+				'}',
+				'',
+				cmt('// Clever hands, a steady heart, a faithful soul.'),
+				cmt('// Rare. Irreplaceable. Mine.'),
+				'System.out.println(' + str('"Firdaous, you are the one exception my heart will never refactor."') + ');'
+			]),
+			letter([
+				cmt('/**'),
+				sp2 + cmt('* The best things are not always loud,'),
+				sp2 + cmt('* sometimes they are quiet, steady, and forever.'),
+				sp2 + cmt('*'),
+				sp2 + cmt('* Firdaous — graceful, gifted, and strong,'),
+				sp2 + cmt('* a treasure the world rarely learns to keep.'),
+				sp2 + cmt('* And by some miracle, you are mine.'),
+				cmt('*/'),
+				'Man me = ' + kw('new') + ' Man(' + str('"shazar"') + ');',
+				'Treasure you = ' + kw('new') + ' Treasure(' + str('"Firdaous"') + ');',
+				'',
+				cmt('// Since December 9, 2025, you have been my favorite constant.'),
+				'me.cherish(you);',
+				'',
+				cmt('// You dream, you do, you turn moments into memories.'),
+				'you.inspire();',
+				'',
+				cmt('// A precious heart, dearer than rubies —'),
+				cmt('// the kind a man would give everything to keep.'),
+				kw('boolean') + ' foreverYours = ' + kw('true') + ';',
+				'',
+				kw('while') + ' (foreverYours) {',
+				pad + 'me.cherish(you);',
+				pad + 'me.protect(you);',
+				'}',
+				'',
+				cmt('// Skilled, devoted, endlessly kind.'),
+				cmt('// Rare. Irreplaceable. Mine.'),
+				'System.out.println(' + str('"Firdaous, of all the lines I\'ll ever write, you are the truest."') + ');'
+			])
+		];
+		// remember recent closing lines so the server can avoid repeating them
+		var CODE_HISTORY_KEY = "loveLetterHistory";
+		var CODE_CURRENT_KEY = "loveLetterCurrent";
+		function codeHistory() {
+			try { return JSON.parse(localStorage.getItem(CODE_HISTORY_KEY)) || []; }
+			catch (_) { return []; }
+		}
+		function pushCodeHistory(line) {
+			var h = codeHistory(); h.push(line);
+			if (h.length > 50) h = h.slice(-50);
+			try { localStorage.setItem(CODE_HISTORY_KEY, JSON.stringify(h)); } catch (_) {}
+		}
+		// strip anything that could break the styled spans
+		function clean(t) {
+			return String(t == null ? "" : t).replace(/[<>]/g, "").replace(/["“”]/g, "").replace(/[—–]/g, ",").trim();
+		}
+		function methodName(t, fb) {
+			return String(t == null ? "" : t).replace(/[^A-Za-z]/g, "") || fb;
+		}
+		// build the styled HTML letter from the fields the server returns
+		function assembleLetter(d) {
+			if (!d || !Array.isArray(d.intro) || d.intro.length < 2) return null;
+			var fin = clean(d.finalLine);
+			if (!fin) return null;
+			var lm = Array.isArray(d.loopMethods) ? d.loopMethods : [];
+			var lines = [cmt("/**")];
+			d.intro.forEach(function (t) { lines.push(sp2 + cmt("* " + clean(t))); });
+			lines.push(
+				cmt("*/"),
+				"Man me = " + kw("new") + " Man(" + str('"shazar"') + ");",
+				"Treasure you = " + kw("new") + " Treasure(" + str('"Firdaous"') + ");",
+				"",
+				cmt("// " + clean(d.sinceComment)),
+				"me.cherish(you);",
+				"",
+				cmt("// " + clean(d.actionComment)),
+				"you." + methodName(d.actionMethod, "shine") + "();",
+				"",
+				cmt("// " + clean(d.traitComment1)),
+				cmt("// " + clean(d.traitComment2)),
+				kw("boolean") + " foreverYours = " + kw("true") + ";",
+				"",
+				kw("while") + " (foreverYours) {",
+				pad + "me." + methodName(lm[0], "honor") + "(you);",
+				pad + "me." + methodName(lm[1], "protect") + "(you);",
+				"}",
+				"",
+				cmt("// " + clean(d.closeComment1)),
+				cmt("// " + (clean(d.closeComment2) || "Rare. Irreplaceable. Mine.")),
+				"System.out.println(" + str('"' + fin + '"') + ");"
+			);
+			return { html: letter(lines), line: fin };
+		}
+		// an unseen hand-written variant for when the API is unavailable
+		function fallbackLetter() {
+			return { html: codeLetters[codeBucket() % codeLetters.length], line: "" };
+		}
+		// fetch a brand-new letter from the server; resolve with { html, line }
+		function fetchNewLetter() {
+			return fetch("/api/letter", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ recent: codeHistory() })
+			})
+			.then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
+			.then(function (d) { return assembleLetter(d && d.letter) || fallbackLetter(); })
+			.catch(function () { return fallbackLetter(); });
+		}
+		function typeLetter(html) {
+			$("#code").html(html);
+			adjustCodePosition();
+			$("#code").typewriter();
+		}
+		function showLetter(res) {
+			if (!res) return;
+			if (res.line) pushCodeHistory(res.line);
+			try { localStorage.setItem(CODE_CURRENT_KEY, JSON.stringify({ bucket: codeBucket(), html: res.html, line: res.line })); } catch (_) {}
+			typeLetter(res.html);
+		}
+		// On load: reuse this window's letter if we already have one (so reloads
+		// don't burn API calls); otherwise pull a brand-new one.
+		function applyCodeLetter() {
+			var stored = null;
+			try { stored = JSON.parse(localStorage.getItem(CODE_CURRENT_KEY)); } catch (_) {}
+			if (stored && stored.bucket === codeBucket() && stored.html) {
+				typeLetter(stored.html);
+			} else {
+				fetchNewLetter().then(showLetter);
+			}
+		}
+
 		if (!document.createElement('canvas').getContext) {
 			var msg = document.createElement("div");
 			msg.id = "errorMsg";
@@ -100,7 +300,7 @@
 			}, 500);
 
 			adjustCodePosition();
-			$("#code").typewriter();
+			applyCodeLetter();
 		}
 
 		// ---- responsive layout: runs after the library's own sizing ----
@@ -270,6 +470,7 @@
 				if (h !== lastHour) {
 					lastHour = h;
 					fetchNew().then(function (t) { setMessage(t, true); });
+					fetchNewLetter().then(showLetter); // pull a fresh code letter too
 				}
 			}, 20 * 1000);
 		})();
