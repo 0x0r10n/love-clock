@@ -83,112 +83,15 @@
 		// ---- rotating "code letter": a brand-new love-letter every 4 hours ----
 		// Each window the browser asks Grok (see /api/letter) for a fresh letter and
 		// assembles it into these styled code spans, remembering recent closing lines
-		// so Grok never repeats itself. The hand-written variants below are only a
-		// fallback for when the API is unavailable. Variant 0 is the letter already
-		// written into the page, so something beautiful shows even without JS.
+		// so the same letter is never shown twice. Nothing hard-coded is ever shown:
+		// if the API is unreachable we re-show the last AI letter saved on the device,
+		// and the page's static letter is blanked out the moment this script runs.
 		function codeBucket() { return Math.floor(Date.now() / (4 * 3600000)); }
 		function cmt(t) { return '<span class="comments">' + t + '</span>'; }
 		function kw(t)  { return '<span class="keyword">' + t + '</span>'; }
 		function str(t) { return '<span class="string">' + t + '</span>'; }
 		var sp2 = '<span class="space"></span>', pad = '<span class="placeholder"></span>';
 		function letter(lines) { return lines.join('<br />') + '<br />'; }
-
-		var codeLetters = [
-			$("#code").html(),
-			letter([
-				cmt('/**'),
-				sp2 + cmt('* Some love stories are written in ink,'),
-				sp2 + cmt('* but ours is compiled into every heartbeat.'),
-				sp2 + cmt('*'),
-				sp2 + cmt('* Firdaous — gentle, radiant, and rare,'),
-				sp2 + cmt('* the answer to prayers I forgot I had made.'),
-				sp2 + cmt('* And somehow, you chose me too.'),
-				cmt('*/'),
-				'Man me = ' + kw('new') + ' Man(' + str('"shazar"') + ');',
-				'Treasure you = ' + kw('new') + ' Treasure(' + str('"Firdaous"') + ');',
-				'',
-				cmt('// Since December 9, 2025, my code finally found its meaning.'),
-				'me.cherish(you);',
-				'',
-				cmt('// You build, you bloom, you turn effort into art.'),
-				'you.create();',
-				'',
-				cmt('// A faithful heart, more precious than gold —'),
-				cmt('// the kind worth guarding with a lifetime.'),
-				kw('boolean') + ' foreverYours = ' + kw('true') + ';',
-				'',
-				kw('while') + ' (foreverYours) {',
-				pad + 'me.adore(you);',
-				pad + 'me.protect(you);',
-				'}',
-				'',
-				cmt('// Brilliant mind, tender soul, unbreakable spirit.'),
-				cmt('// Rare. Irreplaceable. Mine.'),
-				'System.out.println(' + str('"Firdaous, in a world of billions, my heart compiles only for you."') + ');'
-			]),
-			letter([
-				cmt('/**'),
-				sp2 + cmt('* Many things in life run on logic,'),
-				sp2 + cmt('* but loving you needs no condition to be true.'),
-				sp2 + cmt('*'),
-				sp2 + cmt('* Firdaous — kind, skillful, and bright,'),
-				sp2 + cmt('* a rare soul this world did little to deserve.'),
-				sp2 + cmt('* And yet, here you are, beside me.'),
-				cmt('*/'),
-				'Man me = ' + kw('new') + ' Man(' + str('"shazar"') + ');',
-				'Treasure you = ' + kw('new') + ' Treasure(' + str('"Firdaous"') + ');',
-				'',
-				cmt('// Since December 9, 2025, every sunrise has carried your name.'),
-				'me.cherish(you);',
-				'',
-				cmt('// You strive, you shine, you make the hard look effortless.'),
-				'you.excel();',
-				'',
-				cmt('// A virtuous heart, worth more than every jewel —'),
-				cmt('// the kind a man would cross oceans for.'),
-				kw('boolean') + ' foreverYours = ' + kw('true') + ';',
-				'',
-				kw('while') + ' (foreverYours) {',
-				pad + 'me.honor(you);',
-				pad + 'me.stayLoyal(you);',
-				'}',
-				'',
-				cmt('// Clever hands, a steady heart, a faithful soul.'),
-				cmt('// Rare. Irreplaceable. Mine.'),
-				'System.out.println(' + str('"Firdaous, you are the one exception my heart will never refactor."') + ');'
-			]),
-			letter([
-				cmt('/**'),
-				sp2 + cmt('* The best things are not always loud,'),
-				sp2 + cmt('* sometimes they are quiet, steady, and forever.'),
-				sp2 + cmt('*'),
-				sp2 + cmt('* Firdaous — graceful, gifted, and strong,'),
-				sp2 + cmt('* a treasure the world rarely learns to keep.'),
-				sp2 + cmt('* And by some miracle, you are mine.'),
-				cmt('*/'),
-				'Man me = ' + kw('new') + ' Man(' + str('"shazar"') + ');',
-				'Treasure you = ' + kw('new') + ' Treasure(' + str('"Firdaous"') + ');',
-				'',
-				cmt('// Since December 9, 2025, you have been my favorite constant.'),
-				'me.cherish(you);',
-				'',
-				cmt('// You dream, you do, you turn moments into memories.'),
-				'you.inspire();',
-				'',
-				cmt('// A precious heart, dearer than rubies —'),
-				cmt('// the kind a man would give everything to keep.'),
-				kw('boolean') + ' foreverYours = ' + kw('true') + ';',
-				'',
-				kw('while') + ' (foreverYours) {',
-				pad + 'me.cherish(you);',
-				pad + 'me.protect(you);',
-				'}',
-				'',
-				cmt('// Skilled, devoted, endlessly kind.'),
-				cmt('// Rare. Irreplaceable. Mine.'),
-				'System.out.println(' + str('"Firdaous, of all the lines I\'ll ever write, you are the truest."') + ');'
-			])
-		];
 		// remember recent closing lines so the server can avoid repeating them
 		var CODE_HISTORY_KEY = "loveLetterHistory";
 		var CODE_CURRENT_KEY = "loveLetterCurrent";
@@ -242,20 +145,35 @@
 			);
 			return { html: letter(lines), line: fin };
 		}
-		// an unseen hand-written variant for when the API is unavailable
-		function fallbackLetter() {
-			return { html: codeLetters[codeBucket() % codeLetters.length], line: "" };
+		// the most recent AI letter saved on this device (shown only if the API fails)
+		var CODE_LAST_KEY = "loveLetterLast";
+		function getLastLetter() {
+			try { return JSON.parse(localStorage.getItem(CODE_LAST_KEY)); } catch (_) { return null; }
 		}
-		// fetch a brand-new letter from the server; resolve with { html, line }
-		function fetchNewLetter() {
+		// fetch a brand-new letter; resolve with { html, line, fresh }. On failure fall
+		// back to the last AI letter saved on the device (never a hard-coded one). The
+		// `tries` guard refetches in the rare case the model echoes a recent line.
+		function fetchNewLetter(tries) {
+			tries = tries || 0;
 			return fetch("/api/letter", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ recent: codeHistory() })
 			})
 			.then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
-			.then(function (d) { return assembleLetter(d && d.letter) || fallbackLetter(); })
-			.catch(function () { return fallbackLetter(); });
+			.then(function (d) {
+				var res = assembleLetter(d && d.letter);
+				if (!res) return Promise.reject("incomplete");
+				if (tries < 2 && codeHistory().indexOf(res.line) !== -1) {
+					return fetchNewLetter(tries + 1); // a repeat slipped through, try again
+				}
+				res.fresh = true;
+				return res;
+			})
+			.catch(function () {
+				var last = getLastLetter();
+				return last ? { html: last.html, line: last.line, fresh: false } : null;
+			});
 		}
 		function typeLetter(html) {
 			$("#code").html(html);
@@ -263,19 +181,33 @@
 			$("#code").typewriter();
 		}
 		function showLetter(res) {
-			if (!res) return;
-			if (res.line) pushCodeHistory(res.line);
+			if (!res || !res.html) { retryLetterSoon(); return; }
+			if (res.fresh) {
+				pushCodeHistory(res.line);
+				try { localStorage.setItem(CODE_LAST_KEY, JSON.stringify({ html: res.html, line: res.line })); } catch (_) {}
+			}
 			try { localStorage.setItem(CODE_CURRENT_KEY, JSON.stringify({ bucket: codeBucket(), html: res.html, line: res.line })); } catch (_) {}
 			typeLetter(res.html);
 		}
-		// On load: reuse this window's letter if we already have one (so reloads
-		// don't burn API calls); otherwise pull a brand-new one.
+		// nothing fresh and nothing saved yet: keep trying quietly so we never have to
+		// fall back to a hard-coded letter
+		var letterRetry = null;
+		function retryLetterSoon() {
+			if (letterRetry) return;
+			letterRetry = setTimeout(function () {
+				letterRetry = null;
+				fetchNewLetter().then(showLetter);
+			}, 15000);
+		}
+		// On load: reuse this window's letter if we already have one (so reloads don't
+		// burn API calls); otherwise blank the static letter and pull a brand-new one.
 		function applyCodeLetter() {
 			var stored = null;
 			try { stored = JSON.parse(localStorage.getItem(CODE_CURRENT_KEY)); } catch (_) {}
 			if (stored && stored.bucket === codeBucket() && stored.html) {
 				typeLetter(stored.html);
 			} else {
+				$("#code").html(""); // never show the page's hard-coded letter
 				fetchNewLetter().then(showLetter);
 			}
 		}
@@ -365,45 +297,14 @@
 
 		// ---- rotating love message: a brand-new line from Grok every 4 hours ----
 		// The message is generated server-side (see /api/message). The browser asks
-		// for a fresh one at the top of each 4-hour window and remembers the last ~50 so Grok
-		// is told not to repeat them. If the API is ever unavailable, it falls back
-		// to a built-in list so the page always shows something beautiful.
+		// for a fresh one at the top of each 4-hour window and remembers the last ~50
+		// so the same line is never shown twice. Nothing hard-coded is ever shown: if
+		// the API is unreachable we re-show the last AI line saved on the device, and
+		// the page's static line is blanked out the moment this script runs.
 		(function () {
-			var fallback = [
-				"A woman worth dying for, forever isn't long enough with you.",
-				"Of all the souls in this world, my heart only ever wanted yours.",
-				"You are the quiet miracle I never knew I was waiting for.",
-				"Every heartbeat of mine has learned the rhythm of your name.",
-				"With you, even ordinary days feel like a gift I don't deserve.",
-				"You are my favorite prayer and my softest answer.",
-				"In a billion faces, my eyes will always find only you.",
-				"You make forever sound far too short, my love.",
-				"Loving you is the easiest and truest thing I have ever done.",
-				"You are the home my heart kept searching for all along.",
-				"My world grew brighter the moment you walked into it.",
-				"You are the poem my heart writes again and again.",
-				"Beside you, I have found the peace I spent a lifetime chasing.",
-				"You are rarer than rubies and dearer than my own breath.",
-				"My heart beats in a language only you can read.",
-				"You are the dream I am terrified of ever waking from.",
-				"Every road I have ever walked was quietly leading me to you.",
-				"You turned my whole life into a love story worth telling.",
-				"To love you is the greatest honor my heart will ever hold.",
-				"You are the calm in my chaos and the light in my dark.",
-				"My soul recognized yours before my eyes ever did.",
-				"You are the reason I believe forever can be real.",
-				"In your love, I finally understood what it means to belong.",
-				"You are the gentlest thing this rough world ever gave me.",
-				"My heart was always yours, even before it knew your name.",
-				"You are the wish I would spend every star to keep.",
-				"With you, my forever finally has a face and a name.",
-				"You are the sweetest chapter in the story of my life.",
-				"Loving you feels like coming home after a long, cold journey.",
-				"You are my one in a billion, and I am yours, completely."
-			];
-
 			var HISTORY_KEY = "loveMsgHistory";
 			var CURRENT_KEY = "loveMsgCurrent";
+			var LAST_KEY = "loveMsgLast";
 
 			// one bucket per 4 hours, so the message changes six times a day
 			function nowHour() { return Math.floor(Date.now() / (4 * 3600000)); }
@@ -427,40 +328,65 @@
 				$l.fadeOut(800, function () { render(text); $l.fadeIn(1200); });
 			}
 
-			function fallbackLine() {
-				var hist = getHistory();
-				// prefer a fallback line we haven't shown recently
-				var pool = fallback.filter(function (m) { return hist.indexOf(m) === -1; });
-				if (!pool.length) pool = fallback;
-				return pool[nowHour() % pool.length];
+			function getLast() {
+				try { return localStorage.getItem(LAST_KEY) || ""; } catch (_) { return ""; }
 			}
 
-			// fetch a fresh line from Grok; resolve with text (or a fallback on failure)
-			function fetchNew() {
+			// fetch a fresh line from Grok; resolve { text, fresh }. On failure fall back
+			// to the last AI line saved on the device (never a hard-coded one). `tries`
+			// refetches in the rare case the model echoes a recent line.
+			function fetchNew(tries) {
+				tries = tries || 0;
 				return fetch("/api/message", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ recent: getHistory() })
 				})
 				.then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
-				.then(function (d) { return (d && d.message) ? d.message : fallbackLine(); })
-				.catch(function () { return fallbackLine(); });
+				.then(function (d) {
+					var text = (d && d.message) ? d.message : "";
+					if (!text) return Promise.reject("empty");
+					if (tries < 2 && getHistory().indexOf(text) !== -1) {
+						return fetchNew(tries + 1); // a repeat slipped through, try again
+					}
+					return { text: text, fresh: true };
+				})
+				.catch(function () {
+					var last = getLast();
+					return last ? { text: last, fresh: false } : null;
+				});
 			}
 
-			function setMessage(text, animate) {
-				pushHistory(text);
-				try { localStorage.setItem(CURRENT_KEY, JSON.stringify({ hour: nowHour(), text: text })); } catch (_) {}
-				if (animate) fade(text); else render(text);
+			// nothing fresh and nothing saved yet: keep trying quietly so we never have
+			// to fall back to a hard-coded line
+			var msgRetry = null;
+			function retryMsgSoon(animate) {
+				if (msgRetry) return;
+				msgRetry = setTimeout(function () {
+					msgRetry = null;
+					fetchNew().then(function (res) { showMessage(res, animate); });
+				}, 15000);
+			}
+
+			function showMessage(res, animate) {
+				if (!res || !res.text) { retryMsgSoon(animate); return; }
+				if (res.fresh) {
+					pushHistory(res.text);
+					try { localStorage.setItem(LAST_KEY, res.text); } catch (_) {}
+				}
+				try { localStorage.setItem(CURRENT_KEY, JSON.stringify({ hour: nowHour(), text: res.text })); } catch (_) {}
+				if (animate) fade(res.text); else render(res.text);
 			}
 
 			// On load: reuse this window's message if we already have one (so reloads
-			// don't burn API calls); otherwise pull a fresh one.
+			// don't burn API calls); otherwise blank the static line and pull a fresh one.
 			var stored = null;
 			try { stored = JSON.parse(localStorage.getItem(CURRENT_KEY)); } catch (_) {}
 			if (stored && stored.hour === nowHour() && stored.text) {
 				render(stored.text);
 			} else {
-				fetchNew().then(function (t) { setMessage(t, false); });
+				$("#loveu").html(""); // never show the page's hard-coded line
+				fetchNew().then(function (res) { showMessage(res, false); });
 			}
 
 			// Switch right at the top of each new 4-hour window.
@@ -469,7 +395,7 @@
 				var h = nowHour();
 				if (h !== lastHour) {
 					lastHour = h;
-					fetchNew().then(function (t) { setMessage(t, true); });
+					fetchNew().then(function (res) { showMessage(res, true); });
 					fetchNewLetter().then(showLetter); // pull a fresh code letter too
 				}
 			}, 20 * 1000);
