@@ -121,6 +121,8 @@ body::before{
 #code .placeholder{margin-left:15px}
 #code .space{margin-left:7px}
 #code .comments{color:#9b88c9;font-style:italic}
+#code .tw-cursor{color:#cdb8e8;animation:twBlink 1s steps(1) infinite}
+@keyframes twBlink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
 
 /* ---- heart + words ---- */
 #loveHeart{
