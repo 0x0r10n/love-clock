@@ -59,6 +59,99 @@ body::before{
 	100%{transform:translate(var(--drift),-112vh) rotate(24deg);opacity:0}
 }
 
+/* floating broken-heart bubble: frosted glass, cracking apart */
+#brokenBubble{
+	position:fixed;
+	top:14%;
+	right:6%;
+	z-index:1;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	pointer-events:none;
+	animation:bubbleFloat 7s ease-in-out infinite;
+}
+#brokenBubble .heart{
+	position:relative;
+	width:110px;
+	height:110px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	border-radius:50%;
+	background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.22),rgba(120,90,200,.12) 55%,rgba(30,18,55,.28));
+	border:1px solid rgba(255,255,255,.18);
+	backdrop-filter:blur(9px);
+	-webkit-backdrop-filter:blur(9px);
+	box-shadow:0 12px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25),0 0 24px rgba(150,110,255,.18);
+}
+#brokenBubble .caption{
+	margin-top:14px;
+	max-width:160px;
+	text-align:center;
+	font-family:"Dancing Script","cursive";
+	font-size:19px;
+	line-height:1.25;
+	color:#e7dcff;
+	text-shadow:0 2px 14px rgba(0,0,0,.55);
+}
+#brokenBubble .caption .stamp{
+	display:block;
+	margin-top:5px;
+	font-family:"JetBrains Mono","Consolas",monospace;
+	font-size:10.5px;
+	letter-spacing:.4px;
+	color:#a99ccb;
+}
+/* two halves of the heart, overlapped along a jagged seam */
+#brokenBubble .half{
+	position:absolute;
+	font-size:44px;
+	line-height:1;
+	filter:drop-shadow(0 0 10px rgba(255,90,140,.55));
+	transform-origin:center;
+}
+#brokenBubble .half.left{
+	clip-path:polygon(0 0,52% 0,46% 18%,54% 34%,45% 50%,53% 66%,46% 82%,52% 100%,0 100%);
+	animation:crackLeft 3.4s ease-in-out infinite;
+}
+#brokenBubble .half.right{
+	clip-path:polygon(52% 0,100% 0,100% 100%,52% 100%,46% 82%,53% 66%,45% 50%,54% 34%,46% 18%);
+	animation:crackRight 3.4s ease-in-out infinite;
+}
+/* hold, shudder, then split apart and fall — then re-form */
+@keyframes crackLeft{
+	0%,38%{transform:translate(0,0) rotate(0deg)}
+	30%{transform:translate(-1px,0) rotate(-1deg)}
+	34%{transform:translate(1px,0) rotate(1deg)}
+	58%{transform:translate(-15px,7px) rotate(-17deg)}
+	80%{transform:translate(-17px,9px) rotate(-19deg)}
+	100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes crackRight{
+	0%,38%{transform:translate(0,0) rotate(0deg)}
+	30%{transform:translate(1px,0) rotate(1deg)}
+	34%{transform:translate(-1px,0) rotate(-1deg)}
+	58%{transform:translate(15px,7px) rotate(17deg)}
+	80%{transform:translate(17px,9px) rotate(19deg)}
+	100%{transform:translate(0,0) rotate(0deg)}
+}
+/* slow atmospheric drift */
+@keyframes bubbleFloat{
+	0%,100%{transform:translateY(0) rotate(-3deg)}
+	50%{transform:translateY(-18px) rotate(3deg)}
+}
+@media (max-width:900px){
+	#brokenBubble{top:auto;bottom:14px;right:12px}
+	#brokenBubble .heart{width:78px;height:78px}
+	#brokenBubble .half{font-size:30px}
+	#brokenBubble .caption{font-size:15px;max-width:130px;margin-top:9px}
+	#brokenBubble .caption .stamp{font-size:9px}
+}
+@media (prefers-reduced-motion:reduce){
+	#brokenBubble,#brokenBubble .half{animation:none}
+}
+
 #mainDiv{
 	position:relative;
 	z-index:1;
